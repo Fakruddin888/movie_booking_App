@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import Card from "./component/Card";
+import axios from "axios";
+import Summary from "./component/Summary";
+const App = () => {
+  const [mydata, setmyData] = useState([]);
+  const [summaryToggle, setSummaryToggle] = useState(false);
+ 
+  const[summaryData,setSummaryData] = useState({});
+  useEffect(() => {
+    axios.get("https://api.tvmaze.com/search/shows?q=all").then((res) => {
+      console.log(res.data);
 
-function App() {
+      setmyData(res.data);
+    });
+  }, []);
+  const cardDetailHandler = (id) => {
+   
+    let res =mydata.find(val => val.show.id == id);
+    setSummaryData(res);
+    setSummaryToggle(true);
+    console.log(id,res);
+  };
+  const setSummaryHandler = ()=>{
+    setSummaryToggle(false)
+    
+  }
+ 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {!summaryToggle ? (
+        <>
+          <h1 className="company_name">QuadB <span style={{marginLeft:"8px", color:"orange"}}>Tech</span></h1>
+          <div className="container">
+            {mydata.map((curElem) => {
+              return (
+                <Card curElem={curElem} cardDetailHandler={cardDetailHandler} />
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        
+        <Summary summaryData={summaryData} setSummaryToggle={setSummaryHandler} />
+      )}
+    </>
   );
-}
+};
 
 export default App;
